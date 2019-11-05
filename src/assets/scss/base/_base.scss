@@ -1,0 +1,13 @@
+body {
+  background-color: lavender;
+  display: flex;
+  justify-content: center;
+}
+
+.root-wrapper {
+  min-width: 500px;
+  width: 80%;
+  min-height: 500px;
+  height: 60%;
+  background-color: red;
+}

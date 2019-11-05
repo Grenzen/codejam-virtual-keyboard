@@ -1,2 +1,3 @@
-// let add = (a, b) => a + b;
-// console.log(add(3,3));
+let root = document.createElement('div');
+root.className = "root-wrapper";
+document.body.append(root);
