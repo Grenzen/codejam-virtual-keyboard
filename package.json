@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --open --mode development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "lint": "./node_modules/eslint/bin/eslint.js ./src/assets/js/"
   },
   "author": "Marharyta Trutneva (Grenz)",
   "license": "MIT",
@@ -14,6 +15,9 @@
     "@babel/preset-env": "^7.7.1",
     "babel-loader": "^8.0.6",
     "css-loader": "^3.2.0",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
     "mini-css-extract-plugin": "^0.8.0",
     "path": "^0.12.7",
     "sass-loader": "^8.0.0",
