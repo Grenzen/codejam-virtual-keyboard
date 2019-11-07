@@ -1,3 +1,5 @@
+$active: rgba(40, 55, 145, 0.329);
+
 body {
   background-color: rgb(22, 16, 49);
 }
@@ -18,6 +20,7 @@ body {
   padding: 5px;
   height: 250px;
   outline: none;
+  font-size: 1rem;
 }
 
 .keyboard {
@@ -42,17 +45,26 @@ body {
   border-radius: 4px;
   border: none;
   background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1.05rem;
+  font-family: Helvetica;
   outline: none;
   cursor: pointer;
   vertical-align: top;
   padding: 0;
-  -webkit-top-highlight-color: transparent;
   position: relative;
 
+  &:hover {
+    transform: scale(1.1);
+  }
+
   &:active {
-    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0px 7px 14px -7px rgba(196, 195, 195, 0.75);
+    transition: all 0.1s ease-in-out;
+  }
+
+  &:focus {
+    color: rgba(255, 255, 255, 1);
   }
 
   &--low-font {
@@ -80,10 +92,18 @@ body {
   &--shift-wide {
     width: 16%;
     max-width: 134px;
+
+    &-active {
+      background: $active;
+    }
   }
 
   &--command-wide {
     width: 7%;
+
+    &-active {
+      background: $active;
+    }
   }
 
   &--arrows-wide {
@@ -91,9 +111,18 @@ body {
     max-width: 190px;
   }
 
-  &--extra-wide {
+  &--space-wide {
     width: 36%;
     max-width: 500px;
+
+    &:hover {
+      transform: scale(1);
+      box-shadow: 0px 7px 14px -7px rgba(196, 195, 195, 0.75);
+    }
+
+    &-active {
+      background: $active;
+    }
   }
 
   &--activatable::after {
