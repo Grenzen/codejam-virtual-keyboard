@@ -61,8 +61,8 @@ const Keyboard = {
       'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete',
       'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
       'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
-      'lshift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'rshift',
-      'fn', 'control', 'option', 'command', 'space', 'command', 'option', 'arrows'
+      'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'shift',
+      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
     ];
 
     const supperLayoutRu = [
@@ -90,9 +90,8 @@ const Keyboard = {
     ];
 
     // create html
-    keyLayoutRu.forEach((key) => {
+    keyLayoutRu.forEach((key, i) => {
       const keyElement = document.createElement('button');
-      const insertLineBreak = ['delete', '\\', 'return', 'rshift'].indexOf(key) !== -1;
 
       keyElement.setAttribute('type', 'button');
       keyElement.classList.add('keyboard__key');
@@ -132,10 +131,9 @@ const Keyboard = {
           this.properties.value += '\t';
           this.triggerEvent('oninput');
         });
-      } else if (key === 'lshift' || key === 'rshift') {
-        const sliced = key.slice(1);
-        keyElement.textContent = sliced;
-        if (key === 'lshift') {
+      } else if (i === 41 || i === 52) {
+        keyElement.textContent = key;
+        if (i === 41) {
           keyElement.classList.add('keyboard__key--shift-wide',
             'keyboard__key--low-font', 'keyboard__key--low-font-left');
         } else {
@@ -150,27 +148,20 @@ const Keyboard = {
           if (this.properties.shift) {
             this.elements.keys.forEach((change, index) => {
               const element = change;
-              if (this.properties.ru) {
-                element.textContent = supperLayoutRu[index];
-              } else {
-                element.textContent = supperLayoutEn[index];
+              if (element.textContent.length <= 1) {
+                if (this.properties.ru) {
+                  element.textContent = supperLayoutRu[index];
+                } else {
+                  element.textContent = supperLayoutEn[index];
+                }
+                element.textContent = element.textContent.toUpperCase();
               }
             });
           } else {
-            this.elements.keys.forEach((change, index) => {
-              const element = change;
-              if (this.properties.ru) {
-                if (keyLayoutRu[index] === 'space' || keyLayoutRu[index] === 'arrows') {
-                  element.textContent = '';
-                } else if (keyLayoutRu[index] === 'lshift' || keyLayoutRu[index] === 'rshift') {
-                  keyElement.textContent = sliced;
-                } else {
-                  element.textContent = keyLayoutRu[index];
-                }
-              } else {
-                element.textContent = keyLayoutEn[index];
-              }
-            });
+            if (this.properties.ru) {
+              this.toggleShiftOff(keyLayoutRu); //!!!
+            }
+            this.toggleShiftOff(keyLayoutEn); //!!!
           }
         });
       } else if (key === 'control') {
@@ -196,7 +187,7 @@ const Keyboard = {
             this.properties.command);
           this.triggerEvent('oninput');
         });
-      } else if (key === 'space') {
+      } else if (i === 57) {
         keyElement.textContent = '';
         keyElement.classList.add('keyboard__key--space-wide');
         keyElement.addEventListener('click', () => {
@@ -207,24 +198,11 @@ const Keyboard = {
           keyElement.classList.toggle('keyboard__key--space-wide-active',
             this.properties.space);
           if (this.properties.command && this.properties.space) {
-            this.elements.keys.forEach((change, index) => {
-              const element = change;
-              if (this.properties.ru) {
-                element.textContent = keyLayoutEn[index];
-              } else {
-                this.elements.keys.forEach((change, index) => {
-                  const element = change;
-                  if (keyLayoutRu[index] === 'space' || keyLayoutRu[index] === 'arrows') {
-                    element.textContent = '';
-                  } else if (keyLayoutRu[index] === 'lshift' || keyLayoutRu[index] === 'rshift') {
-                    const sliced = key.slice(1);
-                    keyElement.textContent = sliced;
-                  } else {
-                    element.textContent = keyLayoutRu[index];
-                  }
-                });
-              }
-            });
+            if (this.properties.ru) {
+              this.toggleShiftOff(keyLayoutEn); //!!!
+            } else {
+              this.toggleShiftOff(keyLayoutRu); //!!!
+            }
             this.properties.ru = !this.properties.ru;
             this.properties.en = !this.properties.en;
             this.properties.command = false;
@@ -235,7 +213,7 @@ const Keyboard = {
           }
           this.triggerEvent('oninput');
         });
-      } else if (key === 'arrows') {
+      } else if (i === 60) {
         keyElement.classList.add('keyboard__key--arrows-wide');
         keyElement.addEventListener('click', () => {
           this.triggerEvent('oninput');
@@ -251,12 +229,22 @@ const Keyboard = {
         keyElement.textContent = key.toLowerCase();
         keyElement.addEventListener('click', () => {
           this.properties.value += keyElement.textContent;
+          if (this.properties.shift) {
+            if (this.properties.ru) {
+              this.toggleShiftOff(keyLayoutRu); //!!!
+            } else {
+              this.toggleShiftOff(keyLayoutEn); //!!!
+            }
+            this.properties.shift = !this.properties.shift;
+            Keyboard.elements.keys[41].classList.remove('keyboard__key--shift-wide-active');
+            Keyboard.elements.keys[52].classList.remove('keyboard__key--shift-wide-active');
+          }
           this.triggerEvent('oninput');
         });
       }
       fragment.appendChild(keyElement);
 
-      if (insertLineBreak) {
+      if (i === 13 || i === 27 || i === 40 || i === 52) {
         fragment.appendChild(document.createElement('br'));
       }
     });
@@ -286,9 +274,15 @@ const Keyboard = {
     this.properties.shift = !this.properties.shift;
   },
 
+  toggleShiftOff(keyboard) {
+    this.elements.keys.forEach((change, index) => {
+      const element = change;
+      element.textContent = keyboard[index];
+    });
+  }, //rename to ChangeLayout(keyboard)
+
   toggleCommand() {
     this.properties.command = !this.properties.command;
-    // console.log(this.properties.command);
   },
 
   toggleSpace() {
