@@ -24,7 +24,9 @@ const Keyboard = {
     capsLock: false,
     shift: false,
     command: false,
-    space: false
+    space: false,
+    ru: true,
+    en: false
   },
 
   init() {
@@ -71,6 +73,22 @@ const Keyboard = {
       'fn', 'control', 'option', 'command', '', 'command', 'option', ''
     ];
 
+    const keyLayoutEn = [
+      '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete',
+      'tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
+      'caps lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'return',
+      'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'shift',
+      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+    ];
+
+    const supperLayoutEn = [
+      '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'delete',
+      'tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', '|',
+      'caps lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'return',
+      'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?', 'shift',
+      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+    ];
+
     // create html
     keyLayoutRu.forEach((key) => {
       const keyElement = document.createElement('button');
@@ -106,18 +124,6 @@ const Keyboard = {
           this.properties.value += '\n';
           this.triggerEvent('oninput');
         });
-      } else if (key === 'space') {
-        keyElement.textContent = '';
-        keyElement.classList.add('keyboard__key--space-wide');
-        keyElement.addEventListener('click', () => {
-          if (!this.properties.command) {
-            this.properties.value += ' ';
-          }
-          this.toggleSpace();
-          keyElement.classList.toggle('keyboard__key--space-wide-active',
-            this.properties.space);
-          this.triggerEvent('oninput');
-        });
       } else if (key === 'tab') {
         keyElement.classList.add('keyboard__key--wide',
           'keyboard__key--low-font', 'keyboard__key--low-font-left');
@@ -144,17 +150,25 @@ const Keyboard = {
           if (this.properties.shift) {
             this.elements.keys.forEach((change, index) => {
               const element = change;
-              element.textContent = supperLayoutRu[index];
+              if (this.properties.ru) {
+                element.textContent = supperLayoutRu[index];
+              } else {
+                element.textContent = supperLayoutEn[index];
+              }
             });
           } else {
             this.elements.keys.forEach((change, index) => {
               const element = change;
-              if (keyLayoutRu[index] === 'space' || keyLayoutRu[index] === 'arrows') {
-                element.textContent = '';
-              } else if (keyLayoutRu[index] === 'lshift' || keyLayoutRu[index] === 'rshift') {
-                keyElement.textContent = sliced;
+              if (this.properties.ru) {
+                if (keyLayoutRu[index] === 'space' || keyLayoutRu[index] === 'arrows') {
+                  element.textContent = '';
+                } else if (keyLayoutRu[index] === 'lshift' || keyLayoutRu[index] === 'rshift') {
+                  keyElement.textContent = sliced;
+                } else {
+                  element.textContent = keyLayoutRu[index];
+                }
               } else {
-                element.textContent = keyLayoutRu[index];
+                element.textContent = keyLayoutEn[index];
               }
             });
           }
@@ -180,6 +194,45 @@ const Keyboard = {
           this.toggleCommand();
           keyElement.classList.toggle('keyboard__key--command-wide-active',
             this.properties.command);
+          this.triggerEvent('oninput');
+        });
+      } else if (key === 'space') {
+        keyElement.textContent = '';
+        keyElement.classList.add('keyboard__key--space-wide');
+        keyElement.addEventListener('click', () => {
+          if (!this.properties.command) {
+            this.properties.value += ' ';
+          }
+          this.toggleSpace();
+          keyElement.classList.toggle('keyboard__key--space-wide-active',
+            this.properties.space);
+          if (this.properties.command && this.properties.space) {
+            this.elements.keys.forEach((change, index) => {
+              const element = change;
+              if (this.properties.ru) {
+                element.textContent = keyLayoutEn[index];
+              } else {
+                this.elements.keys.forEach((change, index) => {
+                  const element = change;
+                  if (keyLayoutRu[index] === 'space' || keyLayoutRu[index] === 'arrows') {
+                    element.textContent = '';
+                  } else if (keyLayoutRu[index] === 'lshift' || keyLayoutRu[index] === 'rshift') {
+                    const sliced = key.slice(1);
+                    keyElement.textContent = sliced;
+                  } else {
+                    element.textContent = keyLayoutRu[index];
+                  }
+                });
+              }
+            });
+            this.properties.ru = !this.properties.ru;
+            this.properties.en = !this.properties.en;
+            this.properties.command = false;
+            this.properties.space = false;
+            Keyboard.elements.keys[56].classList.remove('keyboard__key--command-wide-active');
+            Keyboard.elements.keys[57].classList.remove('keyboard__key--space-wide-active');
+            Keyboard.elements.keys[58].classList.remove('keyboard__key--command-wide-active');
+          }
           this.triggerEvent('oninput');
         });
       } else if (key === 'arrows') {
@@ -241,12 +294,6 @@ const Keyboard = {
   toggleSpace() {
     if (this.properties.command) {
       this.properties.space = !this.properties.space;
-      this.properties.command = false;
-      this.properties.space = false;
-      Keyboard.elements.keys[56].classList.remove('keyboard__key--command-wide-active');
-      Keyboard.elements.keys[58].classList.remove('keyboard__key--command-wide-active');
-      // console.log(Keyboard.elements.keys[56]);
-      // console.log(`this.properties.command is ${this.properties.command} and this.properties.space is ${this.properties.space}`);
     }
   },
 
