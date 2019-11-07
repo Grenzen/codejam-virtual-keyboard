@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "virtual keyboard implementation",
   "main": "index.js",
-  "homepage": "https://grenzen.github.io/codejam-virtual-keyboard/",
+  "homepage": "https://grenzen.github.io/codejam-virtual-keyboard",
   "scripts": {
     "dev": "webpack-dev-server --open --mode development",
     "build": "webpack --mode production",
