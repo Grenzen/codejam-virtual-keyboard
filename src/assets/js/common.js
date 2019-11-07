@@ -159,9 +159,9 @@ const Keyboard = {
             });
           } else {
             if (this.properties.ru) {
-              this.toggleShiftOff(keyLayoutRu); //!!!
+              this.toggleShiftOff(keyLayoutRu);
             }
-            this.toggleShiftOff(keyLayoutEn); //!!!
+            this.toggleShiftOff(keyLayoutEn);
           }
         });
       } else if (key === 'control') {
@@ -199,17 +199,15 @@ const Keyboard = {
             this.properties.space);
           if (this.properties.command && this.properties.space) {
             if (this.properties.ru) {
-              this.toggleShiftOff(keyLayoutEn); //!!!
+              this.toggleShiftOff(keyLayoutEn);
             } else {
-              this.toggleShiftOff(keyLayoutRu); //!!!
+              this.toggleShiftOff(keyLayoutRu);
             }
             this.properties.ru = !this.properties.ru;
             this.properties.en = !this.properties.en;
-            this.properties.command = false;
             this.properties.space = false;
-            Keyboard.elements.keys[56].classList.remove('keyboard__key--command-wide-active');
+            this.commandReset();
             Keyboard.elements.keys[57].classList.remove('keyboard__key--space-wide-active');
-            Keyboard.elements.keys[58].classList.remove('keyboard__key--command-wide-active');
           }
           this.triggerEvent('oninput');
         });
@@ -231,13 +229,16 @@ const Keyboard = {
           this.properties.value += keyElement.textContent;
           if (this.properties.shift) {
             if (this.properties.ru) {
-              this.toggleShiftOff(keyLayoutRu); //!!!
+              this.toggleShiftOff(keyLayoutRu);
             } else {
-              this.toggleShiftOff(keyLayoutEn); //!!!
+              this.toggleShiftOff(keyLayoutEn);
             }
             this.properties.shift = !this.properties.shift;
             Keyboard.elements.keys[41].classList.remove('keyboard__key--shift-wide-active');
             Keyboard.elements.keys[52].classList.remove('keyboard__key--shift-wide-active');
+          }
+          if (this.properties.command) {
+            this.commandReset();
           }
           this.triggerEvent('oninput');
         });
@@ -279,7 +280,13 @@ const Keyboard = {
       const element = change;
       element.textContent = keyboard[index];
     });
-  }, //rename to ChangeLayout(keyboard)
+  }, // rename to ChangeLayout(keyboard)
+
+  commandReset() {
+    this.properties.command = false;
+    Keyboard.elements.keys[56].classList.remove('keyboard__key--command-wide-active');
+    Keyboard.elements.keys[58].classList.remove('keyboard__key--command-wide-active');
+  },
 
   toggleCommand() {
     this.properties.command = !this.properties.command;
