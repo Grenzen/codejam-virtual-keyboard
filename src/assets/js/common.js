@@ -14,11 +14,6 @@ const Keyboard = {
     keys: []
   },
 
-  eventHandlers: {
-    oninput: null,
-    onclose: null
-  },
-
   properties: {
     value: '',
     capsLock: false,
@@ -44,15 +39,6 @@ const Keyboard = {
     // add to DOM
     this.elements.main.appendChild(this.elements.keysContainer);
     root.appendChild(this.elements.main);
-
-    // use keyboard
-    document.querySelectorAll('.use-keyboard').forEach(element => {
-      element.addEventListener('focus', () => {
-        this.open(element.value, currentValue => {
-          element.value = currentValue;
-        });
-      });
-    });
   },
 
   createKeys() {
@@ -89,6 +75,8 @@ const Keyboard = {
       'fn', 'control', 'option', 'command', '', 'command', 'option', ''
     ];
 
+    const area = document.querySelector('.use-keyboard');
+
     // create html
     keyLayoutRu.forEach((key, i) => {
       const keyElement = document.createElement('button');
@@ -103,7 +91,7 @@ const Keyboard = {
         keyElement.addEventListener('click', () => {
           this.properties.value = this.properties.value.substring(0,
             this.properties.value.length - 1);
-          this.triggerEvent('oninput');
+          this.triggerKeyInput(area);
         });
       } else if (key === 'caps lock') {
         keyElement.classList.add('keyboard__key--mid-wide',
@@ -111,9 +99,16 @@ const Keyboard = {
           'keyboard__key--low-font-left');
         keyElement.textContent = 'caps lock';
         keyElement.addEventListener('click', () => {
-          this.toggleCapsLock();
+          this.toggleField('capsLock');
           keyElement.classList.toggle('keyboard__key--active',
             this.properties.capsLock);
+          this.resetShift();
+          if (this.properties.ru) {
+            this.changeLayout(keyLayoutRu);
+          } else {
+            this.changeLayout(keyLayoutEn);
+          }
+          this.triggerCapsLock();
         });
       } else if (key === 'return') {
         keyElement.classList.add('keyboard__key--mid-wide',
@@ -121,7 +116,6 @@ const Keyboard = {
         keyElement.textContent = 'return';
         keyElement.addEventListener('click', () => {
           this.properties.value += '\n';
-          this.triggerEvent('oninput');
         });
       } else if (key === 'tab') {
         keyElement.classList.add('keyboard__key--wide',
@@ -129,7 +123,6 @@ const Keyboard = {
         keyElement.textContent = 'tab';
         keyElement.addEventListener('click', () => {
           this.properties.value += '\t';
-          this.triggerEvent('oninput');
         });
       } else if (i === 41 || i === 52) {
         keyElement.textContent = key;
@@ -141,27 +134,23 @@ const Keyboard = {
             'keyboard__key--low-font', 'keyboard__key--low-font-right');
         }
         keyElement.addEventListener('click', () => {
-          this.toggleShift();
+          this.toggleField('shift');
           keyElement.classList.toggle('keyboard__key--shift-wide-active',
             this.properties.shift);
 
           if (this.properties.shift) {
-            this.elements.keys.forEach((change, index) => {
-              const element = change;
-              if (element.textContent.length <= 1) {
-                if (this.properties.ru) {
-                  element.textContent = supperLayoutRu[index];
-                } else {
-                  element.textContent = supperLayoutEn[index];
-                }
-                element.textContent = element.textContent.toUpperCase();
-              }
-            });
-          } else {
             if (this.properties.ru) {
-              this.toggleShiftOff(keyLayoutRu);
+              this.changeLayout(supperLayoutRu);
+            } else {
+              this.changeLayout(supperLayoutEn);
             }
-            this.toggleShiftOff(keyLayoutEn);
+          } else if (!this.properties.shift) {
+            if (this.properties.ru) {
+              this.changeLayout(keyLayoutRu);
+            } else {
+              this.changeLayout(keyLayoutEn);
+            }
+            this.triggerCapsLock();
           }
         });
       } else if (key === 'control') {
@@ -169,23 +158,20 @@ const Keyboard = {
           'keyboard__key--low-font-left');
         keyElement.textContent = 'control';
         keyElement.addEventListener('click', () => {
-          this.triggerEvent('oninput');
         });
       } else if (key === 'option') {
         keyElement.classList.add('keyboard__key--low-font');
         keyElement.textContent = 'option';
         keyElement.addEventListener('click', () => {
-          this.triggerEvent('oninput');
         });
       } else if (key === 'command') {
         keyElement.classList.add('keyboard__key--low-font',
           'keyboard__key--command-wide');
         keyElement.textContent = 'command';
         keyElement.addEventListener('click', () => {
-          this.toggleCommand();
+          this.toggleField('command');
           keyElement.classList.toggle('keyboard__key--command-wide-active',
             this.properties.command);
-          this.triggerEvent('oninput');
         });
       } else if (i === 57) {
         keyElement.textContent = '';
@@ -199,48 +185,40 @@ const Keyboard = {
             this.properties.space);
           if (this.properties.command && this.properties.space) {
             if (this.properties.ru) {
-              this.toggleShiftOff(keyLayoutEn);
+              this.changeLayout(keyLayoutEn);
             } else {
-              this.toggleShiftOff(keyLayoutRu);
+              this.changeLayout(keyLayoutRu);
             }
-            this.properties.ru = !this.properties.ru;
-            this.properties.en = !this.properties.en;
-            this.properties.space = false;
-            this.commandReset();
-            Keyboard.elements.keys[57].classList.remove('keyboard__key--space-wide-active');
+            this.triggerCapsLock();
+            this.switchLanguage();
+            this.resetCommand();
+            this.resetSpace();
+            this.resetShift();
           }
-          this.triggerEvent('oninput');
         });
       } else if (i === 60) {
         keyElement.classList.add('keyboard__key--arrows-wide');
         keyElement.addEventListener('click', () => {
-          this.triggerEvent('oninput');
         });
       } else if (key === 'fn') {
         keyElement.classList.add('keyboard__key--low-font',
           'keyboard__key--low-font-left');
         keyElement.textContent = 'fn';
         keyElement.addEventListener('click', () => {
-          this.triggerEvent('oninput');
         });
       } else {
-        keyElement.textContent = key.toLowerCase();
+        keyElement.textContent = key;
         keyElement.addEventListener('click', () => {
           this.properties.value += keyElement.textContent;
-          if (this.properties.shift) {
-            if (this.properties.ru) {
-              this.toggleShiftOff(keyLayoutRu);
-            } else {
-              this.toggleShiftOff(keyLayoutEn);
-            }
-            this.properties.shift = !this.properties.shift;
-            Keyboard.elements.keys[41].classList.remove('keyboard__key--shift-wide-active');
-            Keyboard.elements.keys[52].classList.remove('keyboard__key--shift-wide-active');
+          this.resetShift();
+          if (this.properties.ru) {
+            this.changeLayout(keyLayoutRu);
+          } else if (this.properties.en) {
+            this.changeLayout(keyLayoutEn);
           }
-          if (this.properties.command) {
-            this.commandReset();
-          }
-          this.triggerEvent('oninput');
+          if (this.properties.capsLock) { this.triggerCapsLock(); }
+          this.resetCommand();
+          this.triggerKeyInput(area);
         });
       }
       fragment.appendChild(keyElement);
@@ -253,15 +231,12 @@ const Keyboard = {
     return fragment;
   },
 
-  triggerEvent(handlerName) {
-    if (typeof this.eventHandlers[handlerName] === 'function') {
-      this.eventHandlers[handlerName](this.properties.value);
-    }
+  triggerKeyInput(area) {
+    const input = area;
+    input.value = this.properties.value;
   },
 
-  toggleCapsLock() {
-    this.properties.capsLock = !this.properties.capsLock;
-
+  triggerCapsLock() {
     this.elements.keys.forEach((key) => {
       if (key.textContent.length <= 1) {
         const caps = key;
@@ -271,36 +246,46 @@ const Keyboard = {
     });
   },
 
-  toggleShift() {
-    this.properties.shift = !this.properties.shift;
+  toggleField(field) {
+    this.properties[field] = !this.properties[field];
   },
 
-  toggleShiftOff(keyboard) {
-    this.elements.keys.forEach((change, index) => {
-      const element = change;
-      element.textContent = keyboard[index];
-    });
-  }, // rename to ChangeLayout(keyboard)
+  toggleSpace() {
+    if (this.properties.command) {
+      this.toggleField('space');
+    }
+  },
 
-  commandReset() {
+  resetCommand() {
     this.properties.command = false;
     Keyboard.elements.keys[56].classList.remove('keyboard__key--command-wide-active');
     Keyboard.elements.keys[58].classList.remove('keyboard__key--command-wide-active');
   },
 
-  toggleCommand() {
-    this.properties.command = !this.properties.command;
+  resetShift() {
+    this.properties.shift = false;
+    Keyboard.elements.keys[41].classList.remove('keyboard__key--shift-wide-active');
+    Keyboard.elements.keys[52].classList.remove('keyboard__key--shift-wide-active');
   },
 
-  toggleSpace() {
-    if (this.properties.command) {
-      this.properties.space = !this.properties.space;
-    }
+  resetSpace() {
+    this.properties.space = false;
+    Keyboard.elements.keys[57].classList.remove('keyboard__key--space-wide-active');
   },
 
-  open(initialValue, oninput) {
-    this.properties.value = initialValue || '';
-    this.eventHandlers.oninput = oninput;
+  switchLanguage() {
+    this.properties.ru = !this.properties.ru;
+    this.properties.en = !this.properties.en;
+  },
+
+  changeLayout(keyboard) {
+    this.elements.keys.forEach((change, index) => {
+      if (change.textContent.length <= 1) {
+        const element = change;
+        element.textContent = Keyboard.properties.shift
+          ? keyboard[index].toUpperCase() : keyboard[index].toLowerCase();
+      }
+    });
   }
 };
 
