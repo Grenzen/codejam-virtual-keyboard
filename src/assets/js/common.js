@@ -7,6 +7,14 @@ textarea.classList.add('text-field', 'use-keyboard');
 textarea.autofocus = true;
 root.prepend(textarea);
 
+const keyLayoutRu = [
+  'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete',
+  'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
+  'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
+  'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'shift',
+  'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+];
+
 const Keyboard = {
   elements: {
     main: null,
@@ -20,11 +28,12 @@ const Keyboard = {
     shift: false,
     command: false,
     space: false,
-    ru: true,
+    ru: false,
     en: false
   },
 
-  init() {
+  // init() {
+  init(keyboardPlate) {
     // create main elements
     this.elements.main = document.createElement('div');
     this.elements.keysContainer = document.createElement('div');
@@ -32,7 +41,7 @@ const Keyboard = {
     // setup main elements
     this.elements.main.classList.add('keyboard');
     this.elements.keysContainer.classList.add('keyboard__keys');
-    this.elements.keysContainer.appendChild(this.createKeys());
+    this.elements.keysContainer.appendChild(this.createKeys(keyboardPlate));
 
     this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
 
@@ -41,15 +50,15 @@ const Keyboard = {
     root.appendChild(this.elements.main);
   },
 
-  createKeys() {
+  createKeys(startKeyboard) {
     const fragment = document.createDocumentFragment();
-    const keyLayoutRu = [
-      'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete',
-      'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
-      'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
-      'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'shift',
-      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
-    ];
+    // const keyLayoutRu = [
+    //   'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete',
+    //   'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
+    //   'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
+    //   'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'shift',
+    //   'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+    // ];
 
     const supperLayoutRu = [
       'Ë', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '_', '+', 'delete',
@@ -76,9 +85,18 @@ const Keyboard = {
     ];
 
     const area = document.querySelector('.use-keyboard');
+    let example = localStorage.getItem('keyLanguage') || startKeyboard;
+    if (typeof example === 'string') {
+      example = example.split('+');
+      if (example[0] === '`') {
+        this.properties.en = true;
+      } else {
+        this.properties.ru = true;
+      }
+    }
 
     // create html
-    keyLayoutRu.forEach((key, i) => {
+    example.forEach((key, i) => {
       const keyElement = document.createElement('button');
 
       keyElement.setAttribute('type', 'button');
@@ -185,8 +203,10 @@ const Keyboard = {
             this.properties.space);
           if (this.properties.command && this.properties.space) {
             if (this.properties.ru) {
+              localStorage.setItem('keyLanguage', keyLayoutEn.join('+'));
               this.changeLayout(keyLayoutEn);
             } else {
+              localStorage.setItem('keyLanguage', keyLayoutRu.join('+'));
               this.changeLayout(keyLayoutRu);
             }
             this.triggerCapsLock();
@@ -227,7 +247,6 @@ const Keyboard = {
         fragment.appendChild(document.createElement('br'));
       }
     });
-
     return fragment;
   },
 
@@ -289,4 +308,4 @@ const Keyboard = {
   }
 };
 
-root.addEventListener('DOMContentLoader', Keyboard.init());
+root.addEventListener('DOMContentLoader', Keyboard.init(keyLayoutRu));
