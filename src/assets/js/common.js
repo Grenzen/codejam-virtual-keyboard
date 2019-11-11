@@ -96,7 +96,6 @@ const Keyboard = {
     } else {
       this.properties.ru = true;
     }
-    console.log(`this.properties.en is ${this.properties.en} and this.properties.ru is ${this.properties.ru}`);
 
     // create html
     example.forEach((key, i) => {
