@@ -3,11 +3,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: {
-    app: '../codejam-virtual-keyboard/src/index.js'
+    app: './src/index.js'
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, './dist'),
+    path: path.resolve(__dirname, '../codejam-virtual-keyboard/dist'),
     publicPath: './dist'
   },
   module: {
