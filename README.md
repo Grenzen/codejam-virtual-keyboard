@@ -23,3 +23,5 @@
 
 `штрафы:`
 - ошибки или предупреждения eslint-config-airbnb-base: `-15`
+
+https://grenzen.github.io/codejam-virtual-keyboard/

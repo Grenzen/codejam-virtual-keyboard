@@ -12,14 +12,14 @@ const keyLayoutRu = [
   'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
   'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
   'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'shift',
-  'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+  'fn', 'control', 'option', 'command', '', 'command', 'option', '',
 ];
 
 const Keyboard = {
   elements: {
     main: null,
     keysContainer: null,
-    keys: []
+    keys: [],
   },
 
   properties: {
@@ -29,43 +29,32 @@ const Keyboard = {
     command: false,
     space: false,
     ru: false,
-    en: false
+    en: false,
   },
 
-  // init() {
   init(keyboardPlate) {
-    // create main elements
     this.elements.main = document.createElement('div');
     this.elements.keysContainer = document.createElement('div');
 
-    // setup main elements
     this.elements.main.classList.add('keyboard');
     this.elements.keysContainer.classList.add('keyboard__keys');
     this.elements.keysContainer.appendChild(this.createKeys(keyboardPlate));
 
     this.elements.keys = this.elements.keysContainer.querySelectorAll('.keyboard__key');
 
-    // add to DOM
     this.elements.main.appendChild(this.elements.keysContainer);
     root.appendChild(this.elements.main);
   },
 
   createKeys(startKeyboard) {
     const fragment = document.createDocumentFragment();
-    // const keyLayoutRu = [
-    //   'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'delete',
-    //   'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
-    //   'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
-    //   'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', 'shift',
-    //   'fn', 'control', 'option', 'command', '', 'command', 'option', ''
-    // ];
 
     const supperLayoutRu = [
       'Ë', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '_', '+', 'delete',
       'tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '/',
       'caps lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'return',
       'shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', ',', 'shift',
-      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+      'fn', 'control', 'option', 'command', '', 'command', 'option', '',
     ];
 
     const keyLayoutEn = [
@@ -73,7 +62,7 @@ const Keyboard = {
       'tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
       'caps lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'return',
       'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'shift',
-      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+      'fn', 'control', 'option', 'command', '', 'command', 'option', '',
     ];
 
     const supperLayoutEn = [
@@ -81,7 +70,7 @@ const Keyboard = {
       'tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '{', '}', '|',
       'caps lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ':', '"', 'return',
       'shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', '<', '>', '?', 'shift',
-      'fn', 'control', 'option', 'command', '', 'command', 'option', ''
+      'fn', 'control', 'option', 'command', '', 'command', 'option', '',
     ];
 
     const area = document.querySelector('.use-keyboard');
@@ -97,7 +86,6 @@ const Keyboard = {
       this.properties.ru = true;
     }
 
-    // create html
     example.forEach((key, i) => {
       const keyElement = document.createElement('button');
 
@@ -307,7 +295,7 @@ const Keyboard = {
           ? keyboard[index].toUpperCase() : keyboard[index].toLowerCase();
       }
     });
-  }
+  },
 };
 
 root.addEventListener('DOMContentLoader', Keyboard.init(keyLayoutRu));
